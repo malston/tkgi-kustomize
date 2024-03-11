@@ -1,0 +1,827 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: testapp-guestbook-cluster01
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: testapp-wordpress-cluster01
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  labels:
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: quota
+  namespace: testapp-wordpress-cluster01
+spec:
+  hard:
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    persistentvolumeclaims: "5"
+    pods: "2"
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    requests.storage: 5Gi
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/version: 6.4.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: wordpress-20.0.1
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+---
+apiVersion: v1
+data:
+  my.cnf: |-
+    [mysqld]
+    skip-name-resolve
+    explicit_defaults_for_timestamp
+    basedir=/opt/bitnami/mariadb
+    datadir=/bitnami/mariadb/data
+    plugin_dir=/opt/bitnami/mariadb/plugin
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    tmpdir=/opt/bitnami/mariadb/tmp
+    max_allowed_packet=16M
+    bind-address=*
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+    log-error=/opt/bitnami/mariadb/logs/mysqld.log
+    character-set-server=UTF8
+    collation-server=utf8_general_ci
+    slow_query_log=0
+    long_query_time=10.0
+
+    [client]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    default-character-set=UTF8
+    plugin_dir=/opt/bitnami/mariadb/plugin
+
+    [manager]
+    port=3306
+    socket=/opt/bitnami/mariadb/tmp/mysql.sock
+    pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+---
+apiVersion: v1
+data:
+  wordpress-password: bW16YlNUUEJDSw==
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/version: 6.4.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: wordpress-20.0.1
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+type: Opaque
+---
+apiVersion: v1
+data:
+  mariadb-password: aExGTUxWaElXeQ==
+  mariadb-root-password: WFVaZVF2ZGZ1OQ==
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: guestbook
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: frontend
+  namespace: testapp-guestbook-cluster01
+spec:
+  ports:
+  - port: 80
+  selector:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: guestbook
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: mongo
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: mongo
+  namespace: testapp-guestbook-cluster01
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/version: 6.4.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: wordpress-20.0.1
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+spec:
+  ports:
+  - name: http
+    nodePort: null
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    nodePort: null
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/name: wordpress
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+spec:
+  ports:
+  - name: mysql
+    nodePort: null
+    port: 3306
+    protocol: TCP
+    targetPort: mysql
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/name: mariadb
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: mongo-pvc
+  namespace: testapp-guestbook-cluster01
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: kubernetes-storage-policy
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/version: 6.4.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: wordpress-20.0.1
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: kubernetes-storage-policy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: guestbook
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: frontend
+  namespace: testapp-guestbook-cluster01
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/name: guestbook
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/name: guestbook
+    spec:
+      containers:
+      - env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: harbor.markalston.net/test-apps/gb-frontend:v5
+        name: guestbook
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: mongo
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: mongo
+  namespace: testapp-guestbook-cluster01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/name: mongo
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/name: mongo
+    spec:
+      containers:
+      - args:
+        - --bind_ip
+        - 0.0.0.0
+        - --dbpath
+        - /data/db
+        env: null
+        image: harbor.markalston.net/test-apps/mongo:4.2
+        name: mongo
+        ports:
+        - containerPort: 27017
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-data
+      volumes:
+      - name: mongo-data
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo-client
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: mongo-client
+  namespace: testapp-guestbook-cluster01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-client
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: mongo-client
+    spec:
+      containers:
+      - env:
+        - name: mongo-client_INITDB_ROOT_USERNAME
+          value: dummy
+        - name: mongo-client_INITDB_ROOT_PASSWORD
+          value: dummy
+        image: harbor.markalston.net/test-apps/mongo:4.2
+        name: mongo-client
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/version: 6.4.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: wordpress-20.0.1
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: wordpress
+      app.kubernetes.io/name: wordpress
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: wordpress
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: wordpress
+        app.kubernetes.io/version: 6.4.3
+        helm.sh/chart: wordpress-20.0.1
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: wordpress
+                  app.kubernetes.io/name: wordpress
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: WORDPRESS_SKIP_BOOTSTRAP
+          value: "no"
+        - name: MARIADB_HOST
+          value: wordpress-mariadb
+        - name: MARIADB_PORT_NUMBER
+          value: "3306"
+        - name: WORDPRESS_DATABASE_NAME
+          value: bitnami_wordpress
+        - name: WORDPRESS_DATABASE_USER
+          value: bn_wordpress
+        - name: WORDPRESS_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mariadb-password
+              name: wordpress-mariadb
+        - name: WORDPRESS_USERNAME
+          value: user
+        - name: WORDPRESS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: wordpress-password
+              name: wordpress
+        - name: WORDPRESS_EMAIL
+          value: user@example.com
+        - name: WORDPRESS_FIRST_NAME
+          value: FirstName
+        - name: WORDPRESS_LAST_NAME
+          value: LastName
+        - name: WORDPRESS_HTACCESS_OVERRIDE_NONE
+          value: "no"
+        - name: WORDPRESS_ENABLE_HTACCESS_PERSISTENCE
+          value: "no"
+        - name: WORDPRESS_BLOG_NAME
+          value: User's Blog!
+        - name: WORDPRESS_TABLE_PREFIX
+          value: wp_
+        - name: WORDPRESS_SCHEME
+          value: http
+        - name: WORDPRESS_EXTRA_WP_CONFIG_CONTENT
+          value: ""
+        - name: WORDPRESS_PLUGINS
+          value: none
+        - name: WORDPRESS_OVERRIDE_DATABASE_SETTINGS
+          value: "no"
+        - name: APACHE_HTTP_PORT_NUMBER
+          value: "8080"
+        - name: APACHE_HTTPS_PORT_NUMBER
+          value: "8443"
+        envFrom: null
+        image: harbor.markalston.net/test-apps/bitnami/wordpress:6.4.3-debian-12-r18
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            httpHeaders: []
+            path: /wp-admin/install.php
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: wordpress
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            httpHeaders: []
+            path: /wp-login.php
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /bitnami/wordpress
+          name: wordpress-data
+          subPath: wordpress
+      hostAliases:
+      - hostnames:
+        - status.localhost
+        ip: 127.0.0.1
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: wordpress
+      volumes:
+      - name: wordpress-data
+        persistentVolumeClaim:
+          claimName: wordpress
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: wordpress
+      app.kubernetes.io/name: mariadb
+  serviceName: wordpress-mariadb
+  template:
+    metadata:
+      annotations:
+        checksum/configuration: 65043a6519ab2e487b7e1a3b7941c45b5f521bbf0b3866bf42f0bb40eb9e991b
+      labels:
+        app.kubernetes.io/component: primary
+        app.kubernetes.io/instance: wordpress
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: mariadb
+        app.kubernetes.io/version: 11.2.3
+        helm.sh/chart: mariadb-16.4.0
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: primary
+                  app.kubernetes.io/instance: wordpress
+                  app.kubernetes.io/name: mariadb
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mariadb-root-password
+              name: wordpress-mariadb
+        - name: MARIADB_USER
+          value: bn_wordpress
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mariadb-password
+              name: wordpress-mariadb
+        - name: MARIADB_DATABASE
+          value: bitnami_wordpress
+        image: harbor.markalston.net/test-apps/bitnami/mariadb:11.2.3-debian-12-r4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -ec
+            - |
+              password_aux="${MARIADB_ROOT_PASSWORD:-}"
+              if [[ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]]; then
+                  password_aux=$(cat "$MARIADB_ROOT_PASSWORD_FILE")
+              fi
+              mysqladmin status -uroot -p"${password_aux}"
+          failureThreshold: 3
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: mariadb
+        ports:
+        - containerPort: 3306
+          name: mysql
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -ec
+            - |
+              password_aux="${MARIADB_ROOT_PASSWORD:-}"
+              if [[ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]]; then
+                  password_aux=$(cat "$MARIADB_ROOT_PASSWORD_FILE")
+              fi
+              mysqladmin status -uroot -p"${password_aux}"
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsGroup: 0
+          runAsNonRoot: true
+          runAsUser: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /bitnami/mariadb
+          name: data
+        - mountPath: /opt/bitnami/mariadb/conf/my.cnf
+          name: config
+          subPath: my.cnf
+        - mountPath: /tmp
+          name: empty-dir
+          subPath: tmp-dir
+        - mountPath: /opt/bitnami/mariadb/conf
+          name: empty-dir
+          subPath: app-conf-dir
+        - mountPath: /opt/bitnami/mariadb/tmp
+          name: empty-dir
+          subPath: app-tmp-dir
+        - mountPath: /opt/bitnami/mariadb/logs
+          name: empty-dir
+          subPath: app-logs-dir
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: wordpress-mariadb
+      volumes:
+      - emptyDir: {}
+        name: empty-dir
+      - configMap:
+          name: wordpress-mariadb
+        name: config
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        app.kubernetes.io/component: primary
+        app.kubernetes.io/instance: wordpress
+        app.kubernetes.io/name: mariadb
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      storageClassName: kubernetes-storage-policy
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  labels:
+    app: guestbook
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: guestbook
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    tier: frontend
+  name: frontend
+  namespace: testapp-guestbook-cluster01
+spec:
+  gateways:
+  - istio-gateways/istio-gateway
+  hosts:
+  - guestbook.cluster01.dc01-fd02.kubelab.app
+  http:
+  - route:
+    - destination:
+        host: frontend
+        port:
+          number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/instance: wordpress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mariadb
+    app.kubernetes.io/version: 11.2.3
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+    helm.sh/chart: mariadb-16.4.0
+  name: wordpress-mariadb
+  namespace: testapp-wordpress-cluster01
+spec:
+  egress:
+  - {}
+  ingress:
+  - ports:
+    - port: 3306
+    - port: 3306
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: wordpress
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: mariadb
+      app.kubernetes.io/version: 11.2.3
+      helm.sh/chart: mariadb-16.4.0
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  labels:
+    cluster: cluster01.dc01-fd02.kubelab.app
+    datacenter: dc01
+    env: lab
+    foundation: dc01-fd02
+  name: wordpress
+  namespace: testapp-wordpress-cluster01
+spec:
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    - name: wordpress
+      port: 80
+  virtualhost:
+    fqdn: wordpress.cluster01.dc01-fd02.kubelab.app
+    tls:
+      secretName: cert-manager/prod-wildcard-certs
