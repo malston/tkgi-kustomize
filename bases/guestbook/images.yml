@@ -1,0 +1,30 @@
+manifest:
+  registry: harbor.markalston.net
+  registryUsername: admin
+  registryPasswordKey: harbor_admin_pw
+  images:
+  - name: gb-frontend
+    source: docker.io/paulczar
+    tag: v5
+    format: docker
+    project: test-apps
+  - name: gb-frontend
+    source: gcr.io/google_samples
+    tag: sha256:cbc8ef4b0a2d0b95965e0e7dc8938c270ea98e34ec9d60ea64b2d5f2df2dfbbf
+    format: docker
+    project: test-apps
+  - name: gb-redis-follower
+    source: gcr.io/google_samples
+    tag: v2
+    format: docker
+    project: test-apps
+  - name: redis
+    source: docker.io
+    tag: 6.0.5
+    format: docker
+    project: test-apps
+  - name: mongo
+    source: docker.io
+    tag: 4.2
+    format: docker
+    project: test-apps

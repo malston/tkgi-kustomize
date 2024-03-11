@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+ - ../../base/mongo
+
+components:
+ - ../../components/istio
+
+configMapGenerator:
+- name: parameters
+  env: params.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: parameters
+    fieldPath: data.clusterDomain
+  targets:
+  - select:
+      kind: VirtualService
+      name: frontend
+    fieldPaths:
+    - spec.hosts.0
+    options:
+      delimiter: '.'
+      index: 1
+
+patches:
+- patch: |
+    - op: replace
+      path: /spec/storageClassName
+      value: nas-premium
+  target:
+    kind: PersistentVolumeClaim
+    name: mongo-pvc

@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+configMapGenerator:
+- name: parameters
+  env: params.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: parameters
+    fieldPath: data.clusterDomain
+  targets:
+  - select:
+      kind: HTTPProxy
+      name: wordpress
+    fieldPaths:
+    - spec.virtualhost.fqdn
+    options:
+      delimiter: '.'
+      index: 1
+
+components:
+- ../../components/ingress/contour
+- ../../components/storage/thin-disk

@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: testapp-wordpress-cluster01
+
+labels:
+  - pairs:
+      env: lab
+      cluster: cluster01.dc01-fd02.kubelab.app
+
+resources:
+  - ../../../../../bases/bitnami-wordpress/base
+  - resource-quota.yaml
+
+components:
+- ../../../../../bases/bitnami-wordpress/components/ingress/contour
+
+replacements:
+- source:
+    kind: HTTPProxy
+    name: wordpress
+    fieldPath: metadata.labels.cluster
+  targets:
+  - select:
+      kind: HTTPProxy
+      name: wordpress
+    fieldPaths:
+    - spec.virtualhost.fqdn
+    options:
+      delimiter: '.'
+      index: 1
