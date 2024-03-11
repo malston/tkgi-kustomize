@@ -10,7 +10,7 @@ One thing to take note of -- although the [bases](bases/) folder is checked into
 
 ```yaml
 resources:
-- github.com/testapps/bitnami-wordpress/base?ref=main
+- github.com/malston/kustomize-apps/apps/bitnami-wordpress/base?ref=main
 ```
 
 In overlays, we have a single `foundations` folder containing all the lab foundation TKGi clusters.
@@ -27,7 +27,9 @@ to deploy to that cluster.
 ### Deploy K8s Resource Manifests to cluster01 in dc01-fd01
 
 ```console
-kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd01/cluster01 | kubectl apply -f -
+kubectl kustomize --enable-helm --helm-command helm \
+  overlays/foundations/dc01-fd01/cluster01 | \
+  kubectl apply -f -
 ```
 
 ## Build
