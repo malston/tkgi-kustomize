@@ -81,7 +81,7 @@ for f in "${!foundations[@]}"; do
 done
 ```
 
-## Build K8s Resource Manifests for dc01-fd01
+### Build K8s Resource Manifests for dc01-fd01
 
 Perhaps you want to validate your configurations. If you want to render all the KRM files from a foundation before applying them. Then we can run some tests to validate things like: we have all the correct labels, images are overlayed properly, etc.
 
@@ -90,23 +90,31 @@ mkdir -p manifests/foundations/dc01-fd01
 kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd01 > manifests/foundations/dc01-fd01/allinone.yaml
 ```
 
-## Build K8s Resource Manifests for dc01-fd02
+### Build K8s Resource Manifests for dc01-fd02
 
 ```console
 mkdir -p manifests/foundations/dc01-fd02
 kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd02 > manifests/foundations/dc01-fd02/allinone.yaml
 ```
 
-## Build K8s Resource Manifests for dc02-fd01
+### Build K8s Resource Manifests for dc02-fd01
 
 ```console
 mkdir -p manifests/foundations/dc02-fd01
 kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd01 > manifests/foundations/dc02-fd01/allinone.yaml
 ```
 
-## Build K8s Resource Manifests for dc02-fd02
+### Build K8s Resource Manifests for dc02-fd02
 
 ```console
 mkdir -p manifests/foundations/dc02-fd02
 kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd02 > manifests/foundations/dc02-fd02/allinone.yaml
+```
+
+## Releases
+
+We can cut a release and check in those manifests as a simplified release process.
+
+```console
+./scripts/release v1.0.1
 ```

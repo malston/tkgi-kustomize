@@ -121,7 +121,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  wordpress-password: REVIbG9lSm5paQ==
+  wordpress-password: UU9zMmhVZTdaaQ==
 kind: Secret
 metadata:
   labels:
@@ -140,8 +140,8 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  mariadb-password: TXhUMGxnRG1VVw==
-  mariadb-root-password: MzU3aFFDU2w0MA==
+  mariadb-password: ckNnODBsb2ZzYg==
+  mariadb-root-password: U1pETDVCY243Nw==
 kind: Secret
 metadata:
   labels:
