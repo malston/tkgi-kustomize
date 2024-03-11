@@ -5,10 +5,10 @@ namespace: testapp-wordpress-cluster01
 labels:
   - pairs:
       env: lab
-      cluster: cluster01.dc01-fd02.kubelab.app
+      cluster: cluster01.dc01-fd01.kubelab.app
 
 resources:
-  - ../../../../../bases/bitnami-wordpress/base
+  - github.com/malston/kustomize-apps/apps/bitnami-wordpress/base?ref=main
   - resource-quota.yaml
 
 components:
