@@ -2,7 +2,7 @@
 
 This repository shows an example of how to use [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/) bases and overlays to maintain manifests for applications that need to be deployed to multiple clusters across multiple foundations.
 
-Bases are configurations that inherit nothing. Overlays are configurations that inherit from somewhere. Overlays can inherit from bases or from other overlays.
+Bases are kustomizations that contain common configurations. Overlays are kustomizations that overlay on top of bases. Overlays apply configurations on top of bases or on top of other overlays.
 
 This example has multiple bases, one per application: [bitnami-wordpress](bases/bitnami-wordpress/) and [guestbook](bases/guestbook/). The `bitnami-wordpress` app is a [helm chart](https://bitnami.com/stack/wordpress/helm) while the [guestbook](https://docs.vmware.com/en/VMware-Cloud-Foundation/services/vcf-developer-ready-infrastructure-v1/GUID-6F184EC5-AFC1-4D0A-A5D5-1E31EE938438.html) app is a simple Javascript app that uses MongoDB for it's backend. 
 
@@ -21,8 +21,7 @@ Adopting a repository structure like this to manage multiple foundations makes i
 
 ## Deploy
 
-Under normal circumstances, we want to deploy to a single cluster. In this case, [cluster01](overlays/foundations/dc01-fd01/cluster01/kustomization.yaml) in [dc01-fd01](overlays/foundations/dc01-fd01/kustomization.yaml). This will apply our configurations at both the foundation and cluster level that we want to overlay over the base of all the apps we want
-to deploy to that cluster.
+Under normal circumstances, we want to deploy to a single cluster. In this case, [cluster01](overlays/foundations/dc01-fd01/cluster01/kustomization.yaml) in [dc01-fd01](overlays/foundations/dc01-fd01/kustomization.yaml). This will apply our configurations at both the foundation and cluster level that we want to overlay over the base of all the apps we want to deploy to that cluster.
 
 ### Deploy K8s Resource Manifests to cluster01 in dc01-fd01
 
