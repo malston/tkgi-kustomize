@@ -1,17 +1,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: testapp-guestbook-cluster01
+namespace: testapp-guestbook
 
 labels:
-  - pairs:
-      env: lab
-      cluster: cluster01.dc01-fd01.kubelab.app
+- pairs:
+    env: lab
+    cluster: cluster01.dc01-fd01.kubelab.app
 
 resources:
-  - ../../../../../bases/guestbook/base/mongo
+- github.com/malston/kustomize-apps/apps/guestbook/base?ref=main
+- namespace.yaml
 
 components:
-- ../../../../../bases/guestbook/components/istio
+- ../../../../../bases/guestbook/components/ingress/istio
+- ../../../../../bases/guestbook/components/db/mongo
 
 replacements:
 - source:
