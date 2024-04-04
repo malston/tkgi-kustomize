@@ -9,79 +9,103 @@ This directory contains the Kubernetes manifests for deploying the PHP Guestbook
 
 Download images from Docker and transfer them to Harbor
 
-```console
+```sh
 ../../scripts/copy-images.sh -m images.yml
 ```
 
 ## Deploy
 
+Prior to deploying, we must specify the cluster context:
+
+```sh
+export CLUSTER=$(kubectl config current-context)
+```
+
 Apply based upon your choice of storage
 
-* thin-disk and mongodb
+* `nas-performance` and `mongodb`
 
-  ```sh
-  clusterDomain=$CLUSTER kubectl apply -k thin-disk/mongo
-  ```
+    ```sh
+    ./kustomize.sh apply overlays/dev-nas-performance/mongo
+    ```
 
-* nas-performance and mongodb
+* `nas-ultra` and `mongodb`
 
-  ```sh
-  clusterDomain=$CLUSTER kubectl apply -k nas-performance/mongo
-  ```
+    ```sh
+    ./kustomize.sh apply overlays/dev-nas-ultra/mongo
+    ```
 
-* nas-premium and mongodb
+* `thin-disk` and `mongodb`
 
-  ```sh
-  clusterDomain=$CLUSTER kubectl apply -k nas-premium/mongo
-  ```
+    ```sh
+    ./kustomize.sh apply overlays/dev-thin-disk/mongo
+    ```
+
+* `nas-performance` and `redis`
+
+    ```sh
+    ./kustomize.sh apply overlays/dev-nas-performance/redis
+    ```
+
+* `nas-ultra` and `redis`
+
+    ```sh
+    ./kustomize.sh apply overlays/dev-nas-ultra/redis
+    ```
+
+* `thin-disk` and `redis`
+
+    ```sh
+    ./kustomize.sh apply overlays/dev-thin-disk/redis
+    ```
 
 ## Connect to MongoDB shell
 
 * Open a shell into the mongo-client
 
-  ```sh
-  kubectl exec deploy/mongo-client -it -- /bin/bash
-  ```
+    ```sh
+    kubectl exec deploy/mongo-client -it -- /bin/bash
+    ```
 
 * Login to the MongoDB shell
 
-  ```sh
-  root@mongo-client-d4b459cd8-28wdq:/# mongo --host mongo --port 27017
-  MongoDB shell version v4.2.24
-  connecting to: mongodb://mongo:27017/?compressors=disabled&gssapiServiceName=mongodb
-  Implicit session: session { "id" : UUID("0eebec08-610a-4637-96aa-7126bf80b33b") }
-  MongoDB server version: 4.2.24
-  ```
+    ```sh
+    root@mongo-client-d4b459cd8-28wdq:/# mongo --host mongo --port 27017
+    MongoDB shell version v4.2.24
+    connecting to: mongodb://mongo:27017/?compressors=disabled&gssapiServiceName=mongodb
+    Implicit session: session { "id" : UUID("0eebec08-610a-4637-96aa-7126bf80b33b") }
+    MongoDB server version: 4.2.24
+    ```
 
 * Display list of DBs
 
-  ```sh
-  > show dbs
-  admin      0.000GB
-  config     0.000GB
-  guestbook  0.000GB
-  local      0.000GB
-  ```
+    ```sh
+    > show dbs
+    admin      0.000GB
+    config     0.000GB
+    guestbook  0.000GB
+    local      0.000GB
+    ```
 
 * Use the guestbook db
 
-  ```sh
-  > use guestbook
-  switched to db guestbook
-  ```
+    ```sh
+    > use guestbook
+    switched to db guestbook
+    ```
 
 * Display a list of collections inside the `guestbook` database
 
-  ```sh
-  > show collections
-  messages
-  ```
+    ```sh
+    > show collections
+    messages
+    ```
 
 * Display messages from the `guestbook` database
 
-  ```sh
-  > db.messages.find()
-  { "_id" : ObjectId("65b9352cf2749d797418d582"), "message" : ",mark" }
-  { "_id" : ObjectId("65b9352eb6334019d223d2b2"), "message" : ",mark,ron" }
-  > 
-  ```
+    ```sh
+    > db.messages.find()
+    { "_id" : ObjectId("65b9352cf2749d797418d582"), "message" : ",mark" }
+    { "_id" : ObjectId("65b9352eb6334019d223d2b2"), "message" : ",mark,ron" }
+    >
+    ```

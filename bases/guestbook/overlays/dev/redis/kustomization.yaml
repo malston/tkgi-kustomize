@@ -1,0 +1,57 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: testapp-guestbook
+
+resources:
+- ../../../base
+- namespace.yaml
+
+components:
+ - ../../../components/ingress/contour
+ - ../../../components/db/redis
+
+configMapGenerator:
+- name: parameters
+  env: params.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: parameters
+    fieldPath: data.clusterDomain
+  targets:
+  - select:
+      kind: HTTPProxy
+      name: guestbook
+    fieldPaths:
+    - spec.virtualhost.fqdn
+    options:
+      delimiter: .
+      index: 1
+
+patches:
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: us-docker.pkg.dev/google-samples/containers/gke/gb-frontend:v5
+  target:
+    kind: Deployment
+    name: frontend
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: us-docker.pkg.dev/google-samples/containers/gke/gb-redis-follower:v2
+  target:
+    kind: Deployment
+    name: redis-follower-deployment
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: redis:6.0.5
+  target:
+    kind: Deployment
+    name: redis-leader-deployment

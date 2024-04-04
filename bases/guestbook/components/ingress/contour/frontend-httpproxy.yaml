@@ -1,15 +1,13 @@
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
-  name: wordpress
+  name: guestbook
 spec:
   routes:
   - conditions:
     - prefix: /
     services:
-    - name: wordpress
+    - name: frontend
       port: 80
   virtualhost:
-    fqdn: wordpress.
-    # tls:
-    #   secretName: cert-manager/prod-wildcard-certs
+    fqdn: guestbook.

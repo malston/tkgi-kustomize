@@ -1,0 +1,70 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: testapp-guestbook
+
+resources:
+ - ../../../base
+
+components:
+ - ../../../components/ingress/istio
+ - ../../../components/db/redis
+
+configMapGenerator:
+- name: parameters
+  env: params.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: parameters
+    fieldPath: data.clusterDomain
+  targets:
+  - select:
+      kind: VirtualService
+      name: frontend
+    fieldPaths:
+    - spec.hosts.0
+    options:
+      delimiter: '.'
+      index: 1
+
+patches:
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: harbor.markalston.net/test-apps/gb-frontend@sha256:cbc8ef4b0a2d0b95965e0e7dc8938c270ea98e34ec9d60ea64b2d5f2df2dfbbf
+  target:
+    kind: Deployment
+    name: guestbook-frontend-deployment
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: harbor.markalston.net/test-apps/gb-redis-follower:v2
+  target:
+    kind: Deployment
+    name: redis-follower-deployment
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: harbor.markalston.net/test-apps/redis:6.0.5
+  target:
+    kind: Deployment
+    name: redis-leader-deployment
+- patch: |
+    - op: replace
+      path: /spec/storageClassName
+      value: nas-performance
+  target:
+    kind: PersistentVolumeClaim
+    name: redis-follower-pvc
+- patch: |
+    - op: replace
+      path: /spec/storageClassName
+      value: nas-performance
+  target:
+    kind: PersistentVolumeClaim
+    name: redis-leader-pvc
