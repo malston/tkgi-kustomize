@@ -97,22 +97,37 @@ kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd
 ### Build K8s Resource Manifests for dc01-fd02
 
 ```console
-mkdir -p manifests/foundations/dc01-fd02
-kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd02 > manifests/foundations/dc01-fd02/allinone.yaml
+mkdir -p manifests/foundations/dc01-fd02/cluster01
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd02/cluster01 > manifests/foundations/dc01-fd02/cluster01/allinone.yaml
+```
+
+```console
+mkdir -p manifests/foundations/dc01-fd02/cluster02
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd02/cluster02 > manifests/foundations/dc01-fd02/cluster02/allinone.yaml
 ```
 
 ### Build K8s Resource Manifests for dc02-fd01
 
 ```console
-mkdir -p manifests/foundations/dc02-fd01
-kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd01 > manifests/foundations/dc02-fd01/allinone.yaml
+mkdir -p manifests/foundations/dc02-fd01/cluster01
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd01/cluster01 > manifests/foundations/dc02-fd01/cluster01/allinone.yaml
+```
+
+```console
+mkdir -p manifests/foundations/dc02-fd01/cluster02
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd01/cluster02 > manifests/foundations/dc02-fd01/cluster02/allinone.yaml
 ```
 
 ### Build K8s Resource Manifests for dc02-fd02
 
 ```console
-mkdir -p manifests/foundations/dc02-fd02
-kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd02 > manifests/foundations/dc02-fd02/allinone.yaml
+mkdir -p manifests/foundations/dc02-fd02/cluster01
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd02/cluster01 > manifests/foundations/dc02-fd02/cluster01/allinone.yaml
+```
+
+```console
+mkdir -p manifests/foundations/dc02-fd02/cluster02
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd02/cluster02 > manifests/foundations/dc02-fd02/cluster02/allinone.yaml
 ```
 
 ## Releases
