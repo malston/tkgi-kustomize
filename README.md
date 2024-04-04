@@ -85,8 +85,13 @@ done
 Perhaps you want to validate your configurations. If you want to render all the KRM files from a foundation before applying them. Then we can run some tests to validate things like: we have all the correct labels, images are overlayed properly, etc.
 
 ```console
-mkdir -p manifests/foundations/dc01-fd01
-kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd01 > manifests/foundations/dc01-fd01/allinone.yaml
+mkdir -p manifests/foundations/dc01-fd01/cluster01
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd01/cluster01 > manifests/foundations/dc01-fd01/cluster01/allinone.yaml
+```
+
+```console
+mkdir -p manifests/foundations/dc01-fd01/cluster02
+kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc01-fd01/cluster02 > manifests/foundations/dc01-fd01/cluster02/allinone.yaml
 ```
 
 ### Build K8s Resource Manifests for dc01-fd02
