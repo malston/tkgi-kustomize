@@ -5,7 +5,7 @@ namespace: testapp-guestbook
 labels:
 - pairs:
     env: lab
-    cluster: cluster02.dc01-fd02.kubelab.app
+    cluster: cluster02.dc01.fd01.kubelab.app
 
 resources:
 - github.com/malston/kustomize-apps/apps/guestbook/base?ref=main

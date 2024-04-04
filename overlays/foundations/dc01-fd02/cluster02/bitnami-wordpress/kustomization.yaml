@@ -3,14 +3,14 @@ kind: Kustomization
 namespace: testapp-wordpress
 
 labels:
-  - pairs:
-      env: lab
-      cluster: cluster02.dc01-fd02.kubelab.app
+- pairs:
+    env: lab
+    cluster: cluster02.dc01.fd02.kubelab.app
 
 resources:
-  - github.com/malston/kustomize-apps/apps/bitnami-wordpress/base?ref=main
-  - resource-quota.yaml
-  - namespace.yaml
+- github.com/malston/kustomize-apps/apps/bitnami-wordpress/base?ref=main
+- resource-quota.yaml
+- namespace.yaml
 
 helmCharts:
 - name: wordpress
