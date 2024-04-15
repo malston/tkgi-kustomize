@@ -17,7 +17,7 @@ while read -r overlay_dir; do
     foundations["manifests/$foundation/$cluster"]="${foundation_cluster}"
     mkdir -p "manifests/$foundation/$cluster"
     echo -e "Writing manifests from $cluster_dir to manifests/$foundation/$cluster/allinone.yaml"
-    kubectl kustomize --enable-helm --helm-command helm "$cluster_dir" > "manifests/$foundation/$cluster/allinone.yaml"
+    kubectl kustomize --enable-alpha-plugins --enable-helm "$cluster_dir" > "manifests/$foundation/$cluster/allinone.yaml"
 done < <(find overlays/foundations -depth 3)
 
 for f in "${!foundations[@]}"; do

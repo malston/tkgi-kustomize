@@ -1,60 +1,50 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: testapp-wordpress
 
-labels:
-- pairs:
-    env: lab
-    cluster: cluster02.dc01.fd01.kubelab.app
+namespace: testapp-wordpress
 
 resources:
 - github.com/malston/kustomize-apps/apps/bitnami-wordpress/base?ref=main
 - resource-quota.yaml
 - namespace.yaml
 
-helmCharts:
-- name: wordpress
-  includeCRDs: false
-  valuesMerge: replace
-  valuesInline:
-    global:
-      imageRegistry: docker.io
-    image:
-      registry: docker.io
-      repository: bitnami/wordpress
-      tag: 6.4.3-debian-12-r18
-    persistence:
-      size: 10Gi
-    service:
-      type: ClusterIP
-    serviceAccount:
-      create: false
-    mariadb:
-      serviceAccount:
-        create: false
-      image:
-        repository: bitnami/mariadb
-        tag: 11.2.3-debian-12-r4
-      networkPolicy:
-        enabled: false
-  releaseName: wordpress
-  version: 20.0.1
-  repo: https://charts.bitnami.com/bitnami
+labels:
+- includeSelectors: true
+  pairs:
+    env: lab
+    cluster: cluster02.dc01.fd01.kubelab.app
 
-replacements:
-- source:
-    kind: HTTPProxy
+secretGenerator:
+- name: wordpress-mariadb
+  namespace: wordpress
+  behavior: replace
+  literals:
+    - mariadb-password=password
+    - mariadb-root-password=password
+- name: wordpress
+  namespace: wordpress
+  behavior: replace
+  literals:
+    - wordpress-password=password
+
+patches:
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: harbor.markalston.net/test-apps/wordpress:6.4.3-debian-12-r18
+  target:
+    kind: Deployment
     name: wordpress
-    fieldPath: metadata.labels.cluster
-  targets:
-  - select:
-      kind: HTTPProxy
-      name: wordpress
-    fieldPaths:
-    - spec.virtualhost.fqdn
-    options:
-      delimiter: '.'
-      index: 1
+- patch: |
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: harbor.markalston.net/test-apps/mariadb:11.2.3-debian-12-r4
+  target:
+    kind: StatefulSet
+    name: wordpress-mariadb
+
+transformers:
+- ../../../../../bases/bitnami-wordpress/transformers/contour
 
 components:
 - ../../../../../bases/bitnami-wordpress/components/ingress/contour

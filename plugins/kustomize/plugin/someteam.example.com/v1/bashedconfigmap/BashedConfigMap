@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Example execution:
+# ./someteam.example.com/v1/bashedconfigmap/BashedConfigMap cluster $CLUSTER
+
+# Skip the config file name argument.
+shift
+
+cat <<EOF
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: parameters
+data:
+  $1: $(eval echo "$2")
+EOF

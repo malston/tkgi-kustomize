@@ -135,5 +135,5 @@ kubectl kustomize --enable-helm --helm-command helm overlays/foundations/dc02-fd
 We can cut a release and check in those manifests as a simplified release process.
 
 ```console
-./scripts/release v1.0.1
+./scripts/release.sh v1.0.1
 ```

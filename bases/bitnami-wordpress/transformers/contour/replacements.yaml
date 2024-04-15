@@ -1,0 +1,18 @@
+apiVersion: builtin
+kind: ReplacementTransformer
+metadata:
+  name: notImportantHere
+replacements:
+- source:
+    kind: HTTPProxy
+    name: wordpress
+    fieldPath: metadata.labels.cluster
+  targets:
+  - select:
+      kind: HTTPProxy
+      name: wordpress
+    fieldPaths:
+    - spec.virtualhost.fqdn
+    options:
+      delimiter: .
+      index: 1

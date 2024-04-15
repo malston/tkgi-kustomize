@@ -6,6 +6,6 @@ resources:
 - guestbook
 
 labels:
-  - pairs:
-      datacenter: dc01
-      foundation: dc01-fd02
+- pairs:
+    datacenter: dc01
+    foundation: dc01-fd02

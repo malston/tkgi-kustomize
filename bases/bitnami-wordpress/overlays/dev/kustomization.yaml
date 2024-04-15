@@ -7,35 +7,6 @@ resources:
 - ../../base
 - namespace.yaml
 
-helmCharts:
-- name: wordpress
-  includeCRDs: false
-  valuesMerge: replace
-  valuesInline:
-    global:
-      imageRegistry: docker.io
-    image:
-      registry: docker.io
-      repository: bitnami/wordpress
-      tag: 6.4.3-debian-12-r18
-    persistence:
-      size: 10Gi
-    service:
-      type: ClusterIP
-    serviceAccount:
-      create: false
-    mariadb:
-      serviceAccount:
-        create: false
-      image:
-        repository: bitnami/mariadb
-        tag: 11.2.3-debian-12-r4
-      networkPolicy:
-        enabled: false
-  releaseName: wordpress
-  version: 20.0.1
-  repo: https://charts.bitnami.com/bitnami
-
 configMapGenerator:
 - name: parameters
   env: params.env
